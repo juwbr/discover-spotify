@@ -179,3 +179,5 @@ token.txt
 *.json
 generated/*.html
 *.jpg
+!example_overview.jpg
+!example_overview_detail.jpg
