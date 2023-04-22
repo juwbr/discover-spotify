@@ -177,5 +177,5 @@ pyrightconfig.json
 
 token.txt
 *.json
-*.html
+generated/*.html
 *.jpg
