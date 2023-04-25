@@ -26,12 +26,12 @@ def __load_img(img_path):
         raise ValueError(f'Invalid image path: {img_path}')
     img = plt_imread(img_path)
     img_shape = img.shape
-    if len(img_shape) != 3:
-        raise ValueError(f'Invalid image shape: {img_shape} => should be (x, y, 3)')
-    if img_shape[2] != 3:
-        raise ValueError(f'Invalid image shape: {img_shape} => should be (x, y, 3)')
+    if len(img_shape) not in [2, 3]:
+        raise ValueError(f'({img_path}) Invalid image shape: {img_shape} => should be (x, y) or (x, y, 3)')
+    if len(img_shape) == 3 and img_shape[2] != 3:
+        raise ValueError(f'({img_path}) Invalid image shape: {img_shape} => should be (x, y, 3)')
     if img_shape[0] < 64 or img_shape[1] < 64:
-        raise ValueError(f'Invalid image shape: {img_shape} => should be at least (64, 64, 3)')
+        raise ValueError(f'({img_path}) Invalid image shape: {img_shape} => should be at least (64, 64,)')
     return img
 
 
@@ -56,8 +56,11 @@ def __get_text_color(bg_color):
 def __get_cool_average_color(img, avoid_gray):
     """ Return the average color of the given image.
     The average color is calculated by using the saturation of each pixel as a weight.
-
     """
+
+    # if image is grayscale, return black
+    if len(img.shape) == 2:
+        return np.array([0, 0, 0])
 
     # 1. calculate the saturation of each pixel
     saturation = np.zeros(img.shape[0:2])
