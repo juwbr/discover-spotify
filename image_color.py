@@ -32,6 +32,7 @@ def __load_img(img_path):
         raise ValueError(f'({img_path}) Invalid image shape: {img_shape} => should be (x, y, 3)')
     if img_shape[0] < 64 or img_shape[1] < 64:
         raise ValueError(f'({img_path}) Invalid image shape: {img_shape} => should be at least (64, 64,)')
+
     return img
 
 
