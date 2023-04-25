@@ -1,14 +1,17 @@
 import numpy as np
 from matplotlib.pyplot import imread as plt_imread
 from multiprocessing import Pool
+from os.path import isfile as os_isfile
 
 
 def get_html_colors(ids, path='images/tracks/', avoid_gray=3.0):
     """Return the background and font color of the images in the given path.
     The colors are returned as a dictionary.
     It uses multiprocessing to speed up the process.
+    The higher the value for avoid_gray is chosen, the more likely colors like
+    white, gray and black will be avoided. A mostly suitable value is 3. A range
+    from 1 to 10 is useful.
     """
-    
     ret = {}
     files = [path + file + '.jpg' for file in ids]
     parameters = [(file, avoid_gray) for file in files]
@@ -17,10 +20,25 @@ def get_html_colors(ids, path='images/tracks/', avoid_gray=3.0):
     return ret
 
 
+def __load_img(img_path):
+    """Load image and check if the given image is valid."""
+    if not os_isfile(img_path):
+        raise ValueError(f'Invalid image path: {img_path}')
+    img = plt_imread(img_path)
+    img_shape = img.shape
+    if len(img_shape) != 3:
+        raise ValueError(f'Invalid image shape: {img_shape} => should be (x, y, 3)')
+    if img_shape[2] != 3:
+        raise ValueError(f'Invalid image shape: {img_shape} => should be (x, y, 3)')
+    if img_shape[0] < 64 or img_shape[1] < 64:
+        raise ValueError(f'Invalid image shape: {img_shape} => should be at least (64, 64, 3)')
+    return img
+
+
 def __get_background_and_font_color(parameters):
     """ Return the background and font color of the given image."""
     img_path, avoid_gray = parameters
-    img = plt_imread(img_path)
+    img = __load_img(img_path)
     avg_color = __get_cool_average_color(img, avoid_gray)
     background_color = f'rgb({avg_color[0]}, {avg_color[1]}, {avg_color[2]})'
     text_color = __get_text_color(avg_color / 255)
